@@ -1,0 +1,112 @@
+<div class="flex h-screen bg-slate-100 overflow-hidden">
+  <!-- Sidebar Overlay for mobile -->
+  @if(isSidebarOpen()) {
+    <div (click)="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden" aria-hidden="true"></div>
+  }
+
+  <!-- Sidebar -->
+  <aside 
+    class="w-64 flex-shrink-0 bg-white shadow-md fixed lg:relative inset-y-0 left-0 z-30 transform transition-transform duration-300 ease-in-out"
+    [class.translate-x-0]="isSidebarOpen()"
+    [class.-translate-x-full]="!isSidebarOpen()"
+    [class.lg:translate-x-0]="true">
+    <div class="flex flex-col h-full">
+      <!-- Logo -->
+      <div class="h-20 flex items-center justify-between border-b px-4">
+        <h1 class="text-xl font-bold text-indigo-600 flex items-center">
+            <i class="pi pi-shield mr-3 text-2xl"></i>AsistenciaPro
+        </h1>
+        <button (click)="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-gray-700">
+            <i class="pi pi-times text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-4 py-6 space-y-2">
+        @for (item of menuItems(); track item.id) {
+          <button (click)="setView(item.id)"
+             [class]="activeView() === item.id ? 'bg-indigo-100 text-indigo-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'"
+             class="w-full flex items-center px-4 py-3 rounded-lg transition-colors duration-200">
+            <i [class]="item.icon + ' text-xl mr-4 w-6 text-center'"></i>
+            <span class="font-medium">{{ item.label }}</span>
+          </button>
+        }
+      </nav>
+
+      <!-- Logout -->
+      <div class="px-4 py-6 border-t">
+        <button (click)="onLogout()" class="w-full flex items-center px-4 py-3 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-200">
+          <i class="pi pi-sign-out text-xl mr-4 w-6 text-center"></i>
+          <span class="font-medium">Cerrar Sesión</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Top bar for mobile -->
+    <header class="lg:hidden h-20 flex items-center justify-between bg-white border-b px-4 sm:px-6">
+        <button (click)="toggleSidebar()" class="text-slate-600 hover:text-slate-800">
+            <i class="pi pi-bars text-2xl"></i>
+        </button>
+        <h1 class="text-lg font-bold text-indigo-600">AsistenciaPro</h1>
+        <div class="w-8"></div> <!-- Spacer -->
+    </header>
+    
+    <main class="flex-1 overflow-y-auto p-4 md:p-8">
+      @switch (activeView()) {
+        @case ('scanner') {
+          <div class="flex flex-col items-center space-y-6">
+            <div class="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg text-center">
+              <h2 class="text-3xl font-bold text-slate-800 mb-2">
+                Bienvenido, {{ liveEmployee().firstName }}
+              </h2>
+              <p class="text-slate-500 mb-6">Apunta la cámara al código QR para registrar tu asistencia.</p>
+
+              <!-- Current Status -->
+              <div class="mb-6 p-4 rounded-lg" [class]="liveEmployee().status === 'Entrada registrada' ? 'bg-green-50 border-green-200' : 'bg-slate-100 border-slate-200'">
+                  <p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Estado Actual</p>
+                  <p class="text-2xl font-bold mt-2" [class]="liveEmployee().status === 'Entrada registrada' ? 'text-green-700' : 'text-slate-800'">
+                      {{ liveEmployee().status }}
+                  </p>
+              </div>
+              
+              <!-- QR Scanner -->
+              <div id="qr-reader" class="w-full max-w-sm mx-auto aspect-square border-4 border-dashed border-slate-300 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center mb-4">
+                  <p class="text-slate-500">{{ scannerStatus() }}</p>
+              </div>
+              
+              <!-- Simulation Button -->
+              <button 
+                (click)="simulateScan()" 
+                [disabled]="isScanCooldown()"
+                class="w-full max-w-sm mx-auto bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-4 border border-slate-300 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ isScanCooldown() ? 'Procesando...' : 'Simular Escaneo' }}
+              </button>
+            </div>
+
+            <!-- Action Status Message -->
+            @if (lastActionStatus(); as result) {
+              <div class="w-full max-w-2xl p-4 rounded-lg" [class]="result.success ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <i class="pi text-xl" [class]="result.success ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-500'"></i>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm" [class]="result.success ? 'text-green-700' : 'text-red-700'">
+                      {{ result.message }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+        @case ('history') {
+          <app-employee-history [employee]="liveEmployee()"></app-employee-history>
+        }
+      }
+    </main>
+  </div>
+</div>

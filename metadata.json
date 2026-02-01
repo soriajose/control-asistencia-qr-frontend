@@ -1,0 +1,7 @@
+{
+  "name": "control-asistencia-qr",
+  "description": "Una aplicación para gestionar la asistencia de empleados con inicio de sesión para administradores y empleados. Los administradores pueden gestionar empleados, y los empleados pueden ver su estado y registrar sus entradas y salidas. Mantiene un registro histórico.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

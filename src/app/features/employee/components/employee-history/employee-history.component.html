@@ -1,0 +1,73 @@
+<div class="space-y-4">
+  <div>
+    <h2 class="text-2xl font-bold text-slate-800">Mi Historial de Asistencia</h2>
+    <p class="text-slate-500 mt-1">Aquí puedes ver un resumen de todas tus sesiones de trabajo.</p>
+  </div>
+  
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-slate-500">
+        <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+          <tr>
+            <th scope="col" class="px-6 py-3">Fecha</th>
+            <th scope="col" class="px-6 py-3">Hora de Entrada</th>
+            <th scope="col" class="px-6 py-3">Hora de Salida</th>
+            <th scope="col" class="px-6 py-3">Duración</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (session of paginatedHistory(); track session.clockIn) {
+            <tr class="bg-white border-b hover:bg-slate-50">
+              <td class="px-6 py-4 font-medium text-slate-900">{{ session.clockIn | date:'longDate' }}</td>
+              <td class="px-6 py-4 text-green-600 font-semibold">{{ session.clockIn | date:'mediumTime' }}</td>
+              <td class="px-6 py-4 text-orange-600 font-semibold">
+                @if(session.clockOut) {
+                  {{ session.clockOut | date:'mediumTime' }}
+                } @else {
+                  <span class="text-slate-500 italic font-normal">En curso</span>
+                }
+              </td>
+              <td class="px-6 py-4 font-semibold text-slate-700">
+                @if(session.duration) {
+                  {{ session.duration }}
+                } @else {
+                  -
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr class="bg-white border-b">
+              <td colspan="4" class="px-6 py-4 text-center text-slate-500">
+                No tienes registros de asistencia todavía.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination Controls -->
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-between border-t border-slate-200 bg-white px-4 py-3 sm:px-6">
+          <div class="flex-1 flex justify-between items-center">
+              <p class="text-sm text-slate-700">
+                Página <span class="font-medium">{{ currentPage() }}</span> de <span class="font-medium">{{ totalPages() }}</span>
+              </p>
+              <div class="flex gap-2">
+                   <button 
+                      (click)="previousPage()" 
+                      [disabled]="currentPage() === 1"
+                      class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-slate-900 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus-visible:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                      Anterior
+                  </button>
+                  <button 
+                      (click)="nextPage()" 
+                      [disabled]="currentPage() === totalPages()"
+                      class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-slate-900 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus-visible:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                      Siguiente
+                  </button>
+              </div>
+          </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,182 @@
+<div class="space-y-8">
+
+    <div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-4">Información General</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Card 1: Empleados Presentes -->
+            <div class="bg-white shadow-lg rounded-lg p-6 flex items-center">
+                <div class="bg-indigo-100 rounded-full p-4 mr-4">
+                    <i class="pi pi-users text-3xl text-indigo-600"></i>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold text-slate-800">{{ 1 }}</p>
+                    <p class="text-sm font-medium text-slate-500">Empleados Presentes</p>
+                </div>
+            </div>
+            <!-- Card 2: Llegadas Puntuales -->
+            <div class="bg-white shadow-lg rounded-lg p-6 flex items-center">
+                <div class="bg-green-100 rounded-full p-4 mr-4">
+                    <i class="pi pi-clock text-3xl text-green-600"></i>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold text-slate-800">{{ 2 }}</p>
+                    <p class="text-sm font-medium text-slate-500">Llegadas Puntuales</p>
+                </div>
+            </div>
+            <!-- Card 3: Empleados Ausentes -->
+            <div class="bg-white shadow-lg rounded-lg p-6 flex items-center">
+                <div class="bg-amber-100 rounded-full p-4 mr-4">
+                    <i class="pi pi-user-minus text-3xl text-amber-600"></i>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold text-slate-800">{{ 3 }}</p>
+                    <p class="text-sm font-medium text-slate-500">Empleados Ausentes</p>
+                </div>
+            </div>
+            <!-- Card 4: Salidas Registradas -->
+            <div class="bg-white shadow-lg rounded-lg p-6 flex items-center">
+                <div class="bg-orange-100 rounded-full p-4 mr-4">
+                    <i class="pi pi-sign-out text-3xl text-orange-600"></i>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold text-slate-800">{{ 4 }}</p>
+                    <p class="text-sm font-medium text-slate-500">Salidas Registradas Hoy</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Employee Status Section -->
+    <div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-4">Estado de Empleados</h2>
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Nombre</th>
+                        <th scope="col" class="px-6 py-3">Estado</th>
+                        <th scope="col" class="px-6 py-3">Última Actividad</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @for (employee of paginatedEmployees(); track employee.id) {
+                            <tr class="bg-white border-b hover:bg-slate-50">
+                                <td class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">
+                                    {{ employee.firstName }} {{ employee.lastName }}
+                                </td>
+                                <td class="px-6 py-4">
+                          <span [class]="employee.status === 'Entrada registrada' ? 'bg-green-100 text-green-800' : 'bg-slate-200 text-slate-800'"
+                                class="px-2 py-1 text-xs font-semibold rounded-full">
+                            {{ employee.status }}
+                          </span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-600">
+                                    @if (employee.status === 'Entrada registrada' && employee.lastClockIn) {
+                                        Entrada: {{ employee.lastClockIn | date:'shortTime' }}
+                                    } @else if (employee.lastClockOut) {
+                                        Salida: {{ employee.lastClockOut | date:'shortTime' }}
+                                    } @else {
+                                        -
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination Controls -->
+            @if (employeeStatusTotalPages() > 1) {
+                <div class="flex items-center justify-between border-t border-slate-200 bg-white px-4 py-3 sm:px-6">
+                    <div class="flex-1 flex justify-between items-center">
+                        <p class="text-sm text-slate-700">
+                            Página <span class="font-medium">{{ employeeStatusCurrentPage() }}</span> de <span
+                                class="font-medium">{{ employeeStatusTotalPages() }}</span>
+                        </p>
+                        <div class="flex gap-2">
+                            <button
+                                    (click)="previousEmployeeStatusPage()"
+                                    [disabled]="employeeStatusCurrentPage() === 1"
+                                    class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-slate-900 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus-visible:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Anterior
+                            </button>
+                            <button
+                                    (click)="nextEmployeeStatusPage()"
+                                    [disabled]="employeeStatusCurrentPage() === employeeStatusTotalPages()"
+                                    class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-slate-900 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus-visible:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Siguiente
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Full Attendance Log Section -->
+    <div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-4">Registro Completo de Asistencia</h2>
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Empleado</th>
+                        <th scope="col" class="px-6 py-3">Acción</th>
+                        <th scope="col" class="px-6 py-3">Fecha y Hora</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @for (record of paginatedLog(); track record.id) {
+                            <tr class="bg-white border-b hover:bg-slate-50">
+                                <td class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">
+                                    {{ record.employeeName }}
+                                </td>
+                                <td class="px-6 py-4">
+                                      <span [class]="record.type === 'Entrada' ? 'text-green-600' : 'text-orange-600'">
+                                          {{ record.type }}
+                                      </span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-600">
+                                    {{ record.timestamp | date:'medium' }}
+                                </td>
+                            </tr>
+                        } @empty {
+                            <tr class="bg-white border-b">
+                                <td colspan="3" class="px-6 py-4 text-center text-slate-500">
+                                    Aún no hay registros de asistencia.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination Controls -->
+            @if (logTotalPages() > 1) {
+                <div class="flex items-center justify-between border-t border-slate-200 bg-white px-4 py-3 sm:px-6">
+                    <div class="flex-1 flex justify-between items-center">
+                        <p class="text-sm text-slate-700">
+                            Página <span class="font-medium">{{ logCurrentPage() }}</span> de <span
+                                class="font-medium">{{ logTotalPages() }}</span>
+                        </p>
+                        <div class="flex gap-2">
+                            <button
+                                    (click)="previousLogPage()"
+                                    [disabled]="logCurrentPage() === 1"
+                                    class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-slate-900 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus-visible:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Anterior
+                            </button>
+                            <button
+                                    (click)="nextLogPage()"
+                                    [disabled]="logCurrentPage() === logTotalPages()"
+                                    class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-slate-900 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 focus-visible:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Siguiente
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

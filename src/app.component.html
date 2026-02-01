@@ -1,0 +1,19 @@
+<!--
+@if (loggedInUser(); as user) {
+  @switch (user.role) {
+    @case ('admin') {
+      <app-admin-view (logout)="logout()"></app-admin-view>
+    }
+    @case ('employee') {
+      <app-employee-view [employee]="user.data" (logout)="logout()"></app-employee-view>
+    }
+  }
+} @else {
+    ///ESTE ES EL EJEMPLO HARDCODE
+  ///<app-login (loginSuccess)="handleLoginSuccess($event)"></app-login>
+
+  <app-login (loginSuccess)="handleLoginSuccess()"></app-login>
+}
+-->
+
+<router-outlet></router-outlet>
