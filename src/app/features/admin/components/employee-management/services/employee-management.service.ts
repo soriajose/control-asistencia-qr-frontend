@@ -13,7 +13,7 @@ export class EmployeeManagementService {
   constructor() { }
 
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/employees'; // Tu endpoint
+  private apiUrl = 'http://localhost:8080/api/employees';
 
   // 1. GET PAGINADO
   getEmployees(page: number, size: number, search: string = ''): Observable<Page<EmployeeResponseDto>> {

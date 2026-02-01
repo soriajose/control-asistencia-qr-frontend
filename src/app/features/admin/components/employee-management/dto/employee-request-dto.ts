@@ -5,4 +5,5 @@ export interface EmployeeRequestDto {
     phone?: string;
     username: string;
     password?: string; // Opcional porque en edición puede ir vacío
+    workShiftId?: number
 }

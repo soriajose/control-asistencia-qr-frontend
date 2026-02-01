@@ -1,70 +1,83 @@
-
 <div class="space-y-8">
-  <div>
-    <h2 class="text-2xl font-bold text-slate-800 mb-4">Historial de Asistencia</h2>
-    <div class="bg-white shadow-lg rounded-lg p-6">
-      <label for="employee-select" class="block text-sm font-medium text-slate-700 mb-2">Selecciona un empleado para ver su historial:</label>
-        <select id="employee-select"
-                [ngModel]="selectedEmployeeId()"
-                (ngModelChange)="selectedEmployeeId.set($event)"
-                class="block w-full ...">
-            <option value="">-- Por favor selecciona --</option>
-            @for (employee of allEmployees(); track employee.id) {
-                <option [value]="employee.id">{{ employee.firstName }} {{ employee.lastName }}</option>
-            }
-        </select>
-    </div>
-  </div>
-
-  @if (selectedEmployeeId()) {
     <div>
-      <h3 class="text-xl font-bold text-slate-800 mb-4">Mostrando registros para: {{ selectedEmployeeName() }}</h3>
-      <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm text-left text-slate-500">
-            <thead class="text-xs text-slate-700 uppercase bg-slate-50">
-              <tr>
-                <th scope="col" class="px-6 py-3">Fecha</th>
-                <th scope="col" class="px-6 py-3">Hora de Entrada</th>
-                <th scope="col" class="px-6 py-3">Hora de Salida</th>
-                <th scope="col" class="px-6 py-3">Duración</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (session of employeeHistory(); track session.clockIn) {
-                <tr class="bg-white border-b hover:bg-slate-50">
-                  <td class="px-6 py-4 font-medium text-slate-900">{{ session.clockIn | date:'longDate' }}</td>
-                  <td class="px-6 py-4 text-green-600 font-semibold">{{ session.clockIn | date:'mediumTime' }}</td>
-                  <td class="px-6 py-4 text-orange-600 font-semibold">
-                    @if(session.clockOut) {
-                      {{ session.clockOut | date:'mediumTime' }}
-                    } @else {
-                      <span class="text-slate-500 italic font-normal">En curso</span>
-                    }
-                  </td>
-                  <td class="px-6 py-4 font-semibold text-slate-700">
-                    @if(session.duration) {
-                      {{ session.duration }}
-                    } @else {
-                      -
-                    }
-                  </td>
-                </tr>
-              } @empty {
-                <tr class="bg-white border-b">
-                  <td colspan="4" class="px-6 py-4 text-center text-slate-500">
-                    No hay registros de asistencia para este empleado.
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+        <h2 class="text-2xl font-bold text-slate-800 mb-4">Historial de Asistencia</h2>
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <label for="employee-select" class="block text-sm font-medium text-slate-700 mb-2">Selecciona un empleado
+                para ver su historial:</label>
+            <select id="employee-select"
+                    [ngModel]="selectedEmployeeId()"
+                    (ngModelChange)="selectedEmployeeId.set($event)"
+                    class="block w-full border-slate-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2.5 border">
+                <option value="">-- Por favor selecciona --</option>
+                @for (employee of allEmployees(); track employee.id) {
+                    <option [value]="employee.id">{{ employee.firstName | titlecase }} {{ employee.lastName | titlecase }}</option>
+                }
+            </select>
         </div>
-      </div>
     </div>
-  } @else {
-    <div class="bg-white shadow-lg rounded-lg p-6 text-center">
-        <p class="text-slate-500">Selecciona un empleado para comenzar.</p>
-    </div>
-  }
+
+    @if (selectedEmployeeId()) {
+        <div>
+            <div class="flex flex-col sm:flex-row justify-between items-end sm:items-center mb-4 gap-4">
+                <h3 class="text-xl font-bold text-slate-800">
+                    Mostrando registros para: <span class="text-indigo-600">{{ selectedEmployeeName() }}</span>
+                </h3>
+
+                @if (employeeHistory().length > 0) {
+                    <button (click)="downloadReport()"
+                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center shadow-md">
+                        <i class="pi pi-file-pdf mr-2"></i>
+                        Descargar Reporte
+                    </button>
+                }
+            </div>
+
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-slate-500">
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Fecha</th>
+                            <th scope="col" class="px-6 py-3">Hora de Entrada</th>
+                            <th scope="col" class="px-6 py-3">Hora de Salida</th>
+                            <th scope="col" class="px-6 py-3">Duración</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @for (session of employeeHistory(); track session.clockIn) {
+                                <tr class="bg-white border-b hover:bg-slate-50">
+                                    <td class="px-6 py-4 font-medium text-slate-900">{{ session.clockIn | date:'longDate' }}</td>
+                                    <td class="px-6 py-4 text-green-600 font-semibold">{{ session.clockIn | date:'mediumTime' }}</td>
+                                    <td class="px-6 py-4 text-orange-600 font-semibold">
+                                        @if (session.clockOut) {
+                                            {{ session.clockOut | date:'mediumTime' }}
+                                        } @else {
+                                            <span class="text-slate-500 italic font-normal">En curso</span>
+                                        }
+                                    </td>
+                                    <td class="px-6 py-4 font-semibold text-slate-700">
+                                        @if (session.duration) {
+                                            {{ session.duration }}
+                                        } @else {
+                                            -
+                                        }
+                                    </td>
+                                </tr>
+                            } @empty {
+                                <tr class="bg-white border-b">
+                                    <td colspan="4" class="px-6 py-4 text-center text-slate-500">
+                                        No hay registros de asistencia para este empleado.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    } @else {
+        <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+            <p class="text-slate-500">Selecciona un empleado para comenzar.</p>
+        </div>
+    }
 </div>

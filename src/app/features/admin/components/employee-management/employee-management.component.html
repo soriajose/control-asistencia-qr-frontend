@@ -34,7 +34,7 @@
                     @for (employee of employees(); track employee.id) {
                         <tr class="bg-white border-b hover:bg-slate-50">
                             <td class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">
-                                {{ employee.firstName }} {{ employee.lastName }}
+                                {{ employee.firstName | titlecase }} {{ employee.lastName | titlecase }}
                             </td>
                             <td class="px-6 py-4 text-slate-600">
                                 {{ employee.email || 'N/A' }}
@@ -139,6 +139,29 @@
                         <input id="phone"
                                [ngModel]="phone()" (ngModelChange)="phone.set($event)"
                                name="phone" type="tel" class="w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div>
+                        <label for="shift" class="block text-sm font-medium text-slate-700 mb-1">
+                            Turno de Trabajo <span class="text-red-500">*</span>
+                        </label>
+                        <select id="shift"
+                                [ngModel]="selectedShiftId()"
+                                (ngModelChange)="selectedShiftId.set($event)"
+                                name="shift"
+                                required
+                                class="w-full border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-2 px-3 bg-white">
+
+                            <option [value]="null" disabled>-- Seleccionar Turno --</option>
+
+                            @for (shift of availableShifts(); track shift.id) {
+                                <option [value]="shift.id">
+                                    {{ shift.name }} ({{ shift.startTime }} - {{ shift.endTime }})
+                                </option>
+                            }
+                        </select>
+                        @if (!selectedShiftId() && confirmAction()) { <p class="text-xs text-red-500 mt-1">Debes asignar un turno.</p>
+                        }
                     </div>
 
                     <div class="pt-5 border-t border-slate-200">

@@ -11,6 +11,9 @@ import { AdminDashboardComponent } from './features/admin/components/admin-dashb
 import { EmployeeManagementComponent } from './features/admin/components/employee-management/employee-management.component';
 import { HistoryViewComponent } from './features/admin/components/history-view/history-view.component';
 import { QrCodeGeneratorComponent } from './features/admin/components/qr-code-generator/qr-code-generator.component';
+import {
+    OrganizationConfigComponent
+} from "./features/admin/components/organization-config/organization-config.component";
 
 // --- GUARDIA DE SEGURIDAD (AuthGuard) ---
 // Esto evita que alguien escriba "/admin" y entre sin loguearse
@@ -44,7 +47,8 @@ export const routes: Routes = [
             { path: 'dashboard', component: AdminDashboardComponent },
             { path: 'employees', component: EmployeeManagementComponent },
             { path: 'history', component: HistoryViewComponent },
-            { path: 'qr-generator', component: QrCodeGeneratorComponent }
+            { path: 'qr-generator', component: QrCodeGeneratorComponent },
+            { path: 'config', component: OrganizationConfigComponent}
         ]
     },
 

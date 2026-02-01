@@ -1,9 +1,18 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {EmployeeResponseDto} from "./dto/employee-response-dto";
 import {EmployeeManagementService} from "./services/employee-management.service";
 import {EmployeeRequestDto} from "./dto/employee-request-dto";
+import {WorkshiftResponseDto} from "../workshift/dto/workshift-response-dto";
+import {WorkshiftService} from "../workshift/services/workshift.service";
+
+interface WorkShift {
+    id: number;
+    name: string;
+    startTime: string;
+    endTime: string;
+}
 
 @Component({
     selector: 'app-employee-management',
@@ -12,10 +21,11 @@ import {EmployeeRequestDto} from "./dto/employee-request-dto";
     templateUrl: './employee-management.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EmployeeManagementComponent {
+export class EmployeeManagementComponent implements OnInit {
 
     // Inyectamos el servicio correcto
     employeeManagementService = inject(EmployeeManagementService);
+    workshiftService = inject(WorkshiftService);
 
     // Computed signal to determine modal mode
     editMode = computed(() => !!this.editingEmployee());
@@ -41,6 +51,13 @@ export class EmployeeManagementComponent {
     username = signal('');
     password = signal(''); // Para generar/editar
 
+    // 3. ACTUALIZA EL TIPO DE LA SEÑAL (Usa tu DTO exportado)
+    availableShifts = signal<WorkshiftResponseDto[]>([]);
+    selectedShiftId = signal<number | null>(null);
+
+    // NUEVO: Para validación visual en el HTML (el mensaje rojo)
+    confirmAction = signal(false);
+
     isConfirmModalOpen = signal(false);
     isDeleteModalOpen = signal(false);
     employeeIdToDelete = signal<number | null>(null);
@@ -57,6 +74,19 @@ export class EmployeeManagementComponent {
             // Llamada al backend
             this.loadEmployees(page, this.itemsPerPage(), search);
         }, {allowSignalWrites: true});
+    }
+
+    ngOnInit() {
+        this.loadShifts();
+    }
+
+    loadShifts() {
+        this.workshiftService.getWorkShifts().subscribe({
+            next: (data) => {
+                this.availableShifts.set(data);
+            },
+            error: (err) => console.error('Error cargando turnos:', err)
+        });
     }
 
     loadEmployees(page: number, size: number, search: string) {
@@ -109,6 +139,7 @@ export class EmployeeManagementComponent {
             this.phone.set(employee.phone || '');
             this.username.set(employee.username);
             this.password.set(''); // Password vacía por defecto
+            this.selectedShiftId.set(employee.workShiftId || null);
         } else {
             // MODO CREACIÓN
             this.editingEmployee.set(null);
@@ -132,7 +163,7 @@ export class EmployeeManagementComponent {
             return;
         }
 
-        if (!this.firstName() || !this.lastName() || !this.email()) {
+        if (!this.firstName() || !this.lastName() || !this.email() || !this.selectedShiftId()) {
             alert('Por favor complete los campos obligatorios');
             return;
         }
@@ -153,7 +184,8 @@ export class EmployeeManagementComponent {
             email: this.email(),
             phone: this.phone(),
             username: this.username(),
-            password: this.password() || undefined
+            password: this.password() || undefined,
+            workShiftId: this.selectedShiftId() || undefined
         };
 
         if (this.editingEmployee()) {
@@ -228,6 +260,8 @@ export class EmployeeManagementComponent {
         this.phone.set('');
         this.username.set('');
         this.password.set('');
+        this.selectedShiftId.set(null);
+        this.confirmAction.set(false);
     }
 
     generateUsername() {

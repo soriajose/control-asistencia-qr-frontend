@@ -26,6 +26,7 @@ export class AdminViewComponent {
         {route: 'employees', label: 'Empleados', icon: 'pi pi-users'},
         {route: 'history', label: 'Historial', icon: 'pi pi-history'},
         {route: 'qr-generator', label: 'Generar QR', icon: 'pi pi-qrcode'},
+        {route: 'config', label: 'Configuración', icon: 'pi pi-cog'},
     ] as const);
 
     toggleSidebar() {
